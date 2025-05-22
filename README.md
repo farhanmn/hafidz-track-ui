@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hafidz Track UI
+
+**Hafidz Track UI** is the frontend interface for the Quran memorization tracking system. This application is designed to help mentors and students easily monitor and manage Quran memorization progress in a structured and user-friendly way.
 
 ## Getting Started
 
@@ -19,6 +21,13 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## 🚀 Key Features
+
+- 📊 Memorization and murojaah progress dashboard
+- ✅ Daily checklist for memorization
+- 🔍 Weekly review and history
+- 👤 User profiles (admin and mentors)
 
 ## Learn More
 
