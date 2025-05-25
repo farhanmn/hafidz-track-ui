@@ -1,14 +1,27 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import {logoutUser} from "@/lib/api/auth";
+import {fetchUser, logoutUser, userData} from "@/lib/api/auth";
 import {useRouter} from "next/navigation";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+
+  const [user, setUser] = useState<userData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUser()
+      .then((data) => setUser(data))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (!user) return <p>Please login.</p>;
 
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +58,7 @@ function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
           />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">Musharof</span>
+        <span className="block mr-1 font-medium text-theme-sm">{user.data.name}</span>
 
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
