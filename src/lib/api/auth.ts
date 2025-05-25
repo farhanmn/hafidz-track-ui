@@ -1,3 +1,5 @@
+import { User } from "@/lib/types/user";
+
 export async function loginUser(email: string, password: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
     method: 'POST',
@@ -22,19 +24,7 @@ export async function logoutUser() {
   return res.json();
 }
 
-export type userData = {
-  success: boolean;
-  message: string;
-  data: {
-    id: string;
-    name: string;
-    email: string;
-    role: "ADMIN" | "MUSYRIF";
-    created_at: string;
-  }
-}
-
-export async function fetchUser(): Promise<userData> {
+export async function fetchUser(): Promise<User> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
     method: 'GET',
     credentials: 'include',

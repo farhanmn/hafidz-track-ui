@@ -3,14 +3,15 @@ import Image from "next/image";
 import React, {useEffect, useState} from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import {fetchUser, logoutUser, userData} from "@/lib/api/auth";
-import {useRouter} from "next/navigation";
+import { fetchUser, logoutUser } from "@/lib/api/auth";
+import { useRouter } from "next/navigation";
+import { User } from "@/lib/types/user";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
-  const [user, setUser] = useState<userData | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,7 +54,7 @@ function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
           <Image
             width={44}
             height={44}
-            src="/images/user/owner.jpg"
+            src="/images/user/user-default.png"
             alt="User"
           />
         </span>
@@ -87,10 +88,10 @@ function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
       >
         <div>
           <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            Musharof Chowdhury
+            {user.data.name}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            randomuser@pimjo.com
+            {user.data.email}
           </span>
         </div>
 
