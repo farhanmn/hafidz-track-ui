@@ -30,7 +30,7 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    path: "/",
   },
   {
     icon: <CalenderIcon />,
@@ -46,7 +46,7 @@ const navItems: NavItem[] = [
   {
     name: "Forms",
     icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
+    subItems: [{ name: "Form Elements", path: "/form-elements" }],
   },
   {
     name: "Tables",
@@ -199,17 +199,6 @@ const AppSidebar: React.FC = () => {
                             } menu-dropdown-badge `}
                           >
                             new
-                          </span>
-                        )}
-                        {subItem.pro && (
-                          <span
-                            className={`ml-auto ${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge `}
-                          >
-                            pro
                           </span>
                         )}
                       </span>
