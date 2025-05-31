@@ -33,25 +33,27 @@ const navItems: NavItem[] = [
     path: "/",
   },
   {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
+    icon: <ListIcon />,
+    name: "Halaqah",
+    subItems: [
+      { name: "Ziyadah", path: "/ziyadah" },
+      { name: "Murojaah", path: "/murojaah" },
+    ],
   },
   {
     icon: <UserCircleIcon />,
-    name: "User Profile",
+    name: "Santri",
     path: "/profile",
   },
-
   {
-    name: "Forms",
-    icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements" }],
+    icon: <TableIcon />,
+    name: "Kehadiran",
+    path: "/basic-tables"
   },
   {
-    name: "Tables",
-    icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
+    icon: <CalenderIcon />,
+    name: "Tahfidz Plan",
+    path: "/plan",
   },
   {
     name: "Pages",
@@ -317,7 +319,7 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <Image
-              src="/images/logo/logo-icon.svg"
+              src="/images/logo/only-logo.svg"
               alt="Logo"
               width={32}
               height={32}
