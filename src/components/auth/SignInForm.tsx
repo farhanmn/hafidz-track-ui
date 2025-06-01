@@ -18,6 +18,13 @@ export default function SignInForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (
+      !email.trim() ||
+      !password.trim()
+    ) {
+      alert("Please fill in all required fields");
+      return;
+    }
     try {
       const login = await loginUser(email, password);
       if (login.success) {
@@ -53,8 +60,7 @@ export default function SignInForm() {
                   <Input
                     placeholder="info@gmail.com"
                     onChange={(e) => setEmail(e.target.value)}
-                    type="email"
-                    required />
+                    type="email" />
                 </div>
                 <div>
                   <Label>
@@ -65,7 +71,6 @@ export default function SignInForm() {
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
                       onChange={(e) => setPassword(e.target.value)}
-                      required
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -86,12 +91,12 @@ export default function SignInForm() {
                       Keep me logged in
                     </span>
                   </div>
-                  <Link
-                    href="/reset-password"
-                    className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
-                  >
-                    Forgot password?
-                  </Link>
+                  {/*<Link*/}
+                  {/*  href="/reset-password"*/}
+                  {/*  className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"*/}
+                  {/*>*/}
+                  {/*  Forgot password?*/}
+                  {/*</Link>*/}
                 </div>
                 <div>
                   <Button type="submit" className="w-full" size="sm">

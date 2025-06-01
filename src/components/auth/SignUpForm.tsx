@@ -4,19 +4,55 @@ import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import {ChevronDownIcon, EyeCloseIcon, EyeIcon} from "@/icons";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, {useState} from "react";
 import Select from "@/components/form/Select";
+import {registerUser} from "@/lib/api/auth";
+import {useRouter} from "next/navigation";
+import {Role} from "@/lib/types/user";
 
 export default function SignUpForm() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<Role>(Role.MUSYRIF);
+
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const options = [
-    { value: "ADMIN", label: "Admin" },
-    { value: "MUSYRIF", label: "Musyrif" },
+    { value: "MUSYRIF", label: "Musyrif", selected: true },
   ];
   const handleSelectChange = (value: string) => {
     console.log("Selected value:", value);
+    setRole(value as Role);
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      !name.trim() ||
+      !email.trim() ||
+      !password.trim() ||
+      !role
+    ) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      const register = await registerUser(name, email, password, role);
+      if (register.success) {
+        router.push('/');
+      } else {
+        const msg = register.message ?? "Invalid register";
+        alert(msg);
+      }
+    } catch (err) {
+      console.log(err);
+      alert('Register failed');
+    }
+  };
+
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full overflow-y-auto no-scrollbar">
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
@@ -30,7 +66,7 @@ export default function SignUpForm() {
             </p>
           </div>
           <div>
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="space-y-5">
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   {/* <!-- First Name --> */}
@@ -40,8 +76,9 @@ export default function SignUpForm() {
                     </Label>
                     <Input
                       type="text"
-                      id="fname"
-                      name="fname"
+                      id="name"
+                      name="name"
+                      onChange={(e) => setName(e.target.value)}
                       placeholder="Enter your name"
                     />
                   </div>
@@ -56,6 +93,7 @@ export default function SignUpForm() {
                         placeholder="Select role"
                         onChange={handleSelectChange}
                         className="dark:bg-dark-900"
+                        defaultValue={role}
                       />
                       <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
                         <ChevronDownIcon/>
@@ -72,6 +110,7 @@ export default function SignUpForm() {
                     type="email"
                     id="email"
                     name="email"
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
                   />
                 </div>
@@ -84,6 +123,8 @@ export default function SignUpForm() {
                     <Input
                       placeholder="Enter your password"
                       type={showPassword ? "text" : "password"}
+                      name="password"
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -117,7 +158,12 @@ export default function SignUpForm() {
                 </div>
                 {/* <!-- Button --> */}
                 <div>
-                  <button className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
+                  <button type="submit"
+                    className={`flex items-center justify-center w-full px-4 py-3 text-sm font-medium transition rounded-lg shadow-theme-xs
+                        ${isChecked ? "bg-brand-500 text-white hover:bg-brand-600"
+                      : "bg-gray-400 text-white"}
+                      `}
+                    disabled={!isChecked}>
                     Sign Up
                   </button>
                 </div>

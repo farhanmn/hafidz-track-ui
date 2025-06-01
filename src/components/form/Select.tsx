@@ -50,8 +50,8 @@ const Select: React.FC<SelectProps> = ({
       {/* Map over options */}
       {options.map((option) => (
         <option
-          key={option.value}
-          value={option.value}
+          key={option.value ?? ""}
+          value={option.value ?? ""}
           className="text-gray-700 dark:bg-gray-900 dark:text-gray-400"
         >
           {option.label}

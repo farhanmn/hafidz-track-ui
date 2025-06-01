@@ -9,3 +9,8 @@ export interface User {
     created_at: string;
   }
 }
+
+export enum Role {
+  ADMIN = "ADMIN",
+  MUSYRIF = "MUSYRIF",
+}
