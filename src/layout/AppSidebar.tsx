@@ -43,7 +43,7 @@ const navItems: NavItem[] = [
   {
     icon: <UserCircleIcon />,
     name: "Santri",
-    path: "/profile",
+    path: "/students",
   },
   {
     icon: <TableIcon />,

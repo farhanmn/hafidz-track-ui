@@ -5,13 +5,13 @@ import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { fetchUser, logoutUser } from "@/lib/api/auth";
 import { useRouter } from "next/navigation";
-import { User } from "@/lib/types/user";
+import { UserResponse } from "@/lib/types/user";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
