@@ -8,7 +8,7 @@ import React, {useState} from "react";
 import Select from "@/components/form/Select";
 import {registerUser} from "@/lib/api/auth";
 import {useRouter} from "next/navigation";
-import {Role} from "@/lib/types/user";
+import {Role} from "@/lib/types/constant";
 
 export default function SignUpForm() {
   const [name, setName] = useState("");
