@@ -10,6 +10,7 @@ import {getUsers} from "@/lib/api/user";
 import Select from "@/components/form/Select";
 import Input from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
+import {PencilIcon, TrashBinIcon} from "@/icons";
 
 interface Options {
   value: string;
@@ -265,7 +266,7 @@ export default function StudentTable() {
                         className="bg-yellow-500 dark:bg-yellow-600 hover:bg-yellow-600 dark:hover:bg-yellow-700 text-white dark:text-white/90"
                         size="sm"
                       >
-                        Edit
+                        <PencilIcon className="fill-gray-500 dark:fill-gray-400" />
                       </Button>
                       <Button
                         onClick={() => handleDelete(student.id)}
@@ -273,7 +274,7 @@ export default function StudentTable() {
                         className="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 text-white dark:text-white/90"
                         size="sm"
                       >
-                        Delete
+                        <TrashBinIcon className="fill-gray-500 dark:fill-gray-400" />
                       </Button>
                     </div>
                   </TableCell>

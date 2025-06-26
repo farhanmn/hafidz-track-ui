@@ -1,11 +1,16 @@
 'use client';
 import React, {useEffect, useState} from "react";
-import {Table, TableBody, TableCell, TableHeader, TableRow,} from "../ui/table";
+import {Table, TableBody, TableCell, TableHeader, TableRow} from "../ui/table";
 import {Role} from "@/lib/types/constant";
 import {getUsers} from "@/lib/api/user";
 import Select from "@/components/form/Select";
 import Button from "@/components/ui/button/Button";
 import {User} from "@/lib/types/user";
+import {
+  PencilIcon,
+  TrashBinIcon
+} from "@/icons"
+import { useRouter } from 'next/navigation';
 
 interface Options {
   value: string;
@@ -17,13 +22,14 @@ export default function UserTable() {
   const [role, setRole] = useState<Options[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleAdd = () => {
-    console.log('Add users with id:');
+    router.push('/users/add');
   };
 
   const handleEdit = (id: string) => {
-    console.log('Edit users with id:', id);
+    router.push(`/users/${id}/edit`);
   };
 
   const handleDelete = async (id: string) => {
@@ -49,6 +55,10 @@ export default function UserTable() {
     setLoading(true);
     try {
       const res = [
+        {
+          value: "ALL",
+          label: "ALL",
+        },
         {
           value: Role.ADMIN,
           label: Role.ADMIN,
@@ -82,11 +92,6 @@ export default function UserTable() {
     loadRole();
     loadUsers();
   }, []);
-
-  // const handleFilter = () => {
-  //   loadUsers(roleId as Role);
-  //   console.log(users);
-  // };
 
 
   return (
@@ -128,7 +133,6 @@ export default function UserTable() {
                 >
                   <Select
                     options={role}
-                    placeholder="All Roles"
                     onChange={handleSelectChange}
                     className="dark:bg-dark-900"
                   />
@@ -189,7 +193,7 @@ export default function UserTable() {
                         className="bg-yellow-500 dark:bg-yellow-600 hover:bg-yellow-600 dark:hover:bg-yellow-700 text-white dark:text-white/90"
                         size="sm"
                       >
-                        Edit
+                        <PencilIcon className="fill-gray-500 dark:fill-gray-400" />
                       </Button>
                       <Button
                         onClick={() => handleDelete(user.id)}
@@ -197,7 +201,7 @@ export default function UserTable() {
                         className="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 text-white dark:text-white/90"
                         size="sm"
                       >
-                        Delete
+                        <TrashBinIcon className="fill-gray-500 dark:fill-gray-400" />
                       </Button>
                     </div>
                   </TableCell>
