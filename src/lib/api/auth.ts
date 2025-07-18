@@ -1,5 +1,5 @@
 import { User } from "@/lib/types/user";
-import { Response } from "@/lib/types/response";
+import { SingleResponse} from "@/lib/types/response";
 import { Role } from "@/lib/types/constant";
 
 export async function loginUser(email: string, password: string) {
@@ -26,7 +26,7 @@ export async function logoutUser() {
   return res.json();
 }
 
-export async function fetchUser(): Promise<Response<User>> {
+export async function fetchUser(): Promise<SingleResponse<User>> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
     method: 'GET',
     credentials: 'include',
