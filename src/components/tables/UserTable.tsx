@@ -5,12 +5,11 @@ import {Role} from "@/lib/types/constant";
 import {getUsers} from "@/lib/api/user";
 import Select from "@/components/form/Select";
 import Button from "@/components/ui/button/Button";
+import Tooltip, {POSITION} from "@/components/ui/tooltip/Tooltip";
 import {User} from "@/lib/types/user";
-import {
-  PencilIcon,
-  TrashBinIcon
-} from "@/icons"
-import { useRouter } from 'next/navigation';
+import {PencilIcon, TrashBinIcon} from "@/icons"
+import {useRouter} from 'next/navigation';
+import {fetchUser} from "@/lib/api/auth";
 
 interface Options {
   value: string;
@@ -21,6 +20,7 @@ export default function UserTable() {
   const [roleId, setRoleId] = useState('');
   const [role, setRole] = useState<Options[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [loggedUsers, setLoggedUsers] = useState<User>();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -88,7 +88,17 @@ export default function UserTable() {
     }
   };
 
+  const getProfile = async () => {
+    try {
+      const res = await fetchUser();
+      setLoggedUsers(res.data);
+    } catch (err) {
+      console.error('Failed to load student data:', err);
+    }
+  }
+
   useEffect(() => {
+    getProfile();
     loadRole();
     loadUsers();
   }, []);
@@ -195,14 +205,28 @@ export default function UserTable() {
                       >
                         <PencilIcon className="fill-gray-500 dark:fill-gray-400" />
                       </Button>
-                      <Button
-                        onClick={() => handleDelete(user.id)}
-                        type="button"
-                        className="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 text-white dark:text-white/90"
-                        size="sm"
-                      >
-                        <TrashBinIcon className="fill-gray-500 dark:fill-gray-400" />
-                      </Button>
+                      { loggedUsers?.id !== user.id ? (
+                        <Button
+                          onClick={() => handleDelete(user.id)}
+                          type="button"
+                          className="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 text-white dark:text-white/90"
+                          size="sm"
+                        >
+                          <TrashBinIcon className="fill-gray-500 dark:fill-gray-400" />
+                        </Button>
+                      ) : (
+                        <Tooltip text="Cannot delete the account you are currently logged in to" position={POSITION.top}>
+                          <Button
+                            onClick={() => handleDelete(user.id)}
+                            type="button"
+                            className="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 text-white dark:text-white/90"
+                            size="sm"
+                            disabled
+                          >
+                            <TrashBinIcon className="fill-gray-500 dark:fill-gray-400" />
+                          </Button>
+                        </Tooltip>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
