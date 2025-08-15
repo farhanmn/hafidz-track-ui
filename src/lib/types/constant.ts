@@ -9,6 +9,7 @@ export enum ParentType {
 }
 
 export enum Role {
+  ALL = "ALL",
   ADMIN = "ADMIN",
   MUSYRIF = "MUSYRIF",
 }

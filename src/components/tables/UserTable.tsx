@@ -1,36 +1,35 @@
 'use client';
 import React, {useEffect, useState} from "react";
-import {Table, TableBody, TableCell, TableHeader, TableRow,} from "../ui/table";
-
-import {Student} from "@/lib/types/student";
-import Badge from "../ui/badge/Badge";
-import {fetchStudent} from "@/lib/api/student";
-import { StudentStatus} from "@/lib/types/constant";
+import {Table, TableBody, TableCell, TableHeader, TableRow} from "../ui/table";
+import {Role} from "@/lib/types/constant";
 import {getUsers} from "@/lib/api/user";
 import Select from "@/components/form/Select";
-import Input from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
-import {PencilIcon, TrashBinIcon} from "@/icons";
+import Tooltip, {POSITION} from "@/components/ui/tooltip/Tooltip";
+import {User} from "@/lib/types/user";
+import {PencilIcon, TrashBinIcon} from "@/icons"
+import {useRouter} from 'next/navigation';
+import {fetchUser} from "@/lib/api/auth";
 
 interface Options {
   value: string;
   label: string;
 }
 
-export default function StudentTable() {
-  const [gradeStatus, setGradeStatus] = useState('');
-  const [musyrifId, setMusyrifId] = useState('');
-  const [name, setName] = useState('');
-  const [students, setStudents] = useState<Student[]>([]);
-  const [musyrif, setMusyrif] = useState<Options[]>([]);
+export default function UserTable() {
+  const [roleId, setRoleId] = useState('');
+  const [role, setRole] = useState<Options[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loggedUsers, setLoggedUsers] = useState<User>();
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleAdd = () => {
-    console.log('Add student with id:');
+    router.push('/users/add');
   };
 
   const handleEdit = (id: string) => {
-    console.log('Edit student with id:', id);
+    router.push(`/users/${id}/edit`);
   };
 
   const handleDelete = async (id: string) => {
@@ -40,29 +39,36 @@ export default function StudentTable() {
     try {
       console.log('Deleting student with id:', id);
 
-      loadStudents();
+      loadUsers();
     } catch (error) {
       console.error('Gagal menghapus siswa:', error);
     }
   };
 
-
   const handleSelectChange = (value: string) => {
     console.log("Selected value:", value);
-    setMusyrifId(value);
+    setRoleId(value);
+    loadUsers(value as Role);
   };
 
-  const loadMusyrif = async () => {
+  const loadRole = async () => {
     setLoading(true);
     try {
-      const res = await getUsers('musyrif');
-      const options = res.data.data.map((item) => {
-        return {
-          value: item.id,
-          label: item.name,
+      const res = [
+        {
+          value: "ALL",
+          label: "ALL",
+        },
+        {
+          value: Role.ADMIN,
+          label: Role.ADMIN,
+        },
+        {
+          value: Role.MUSYRIF,
+          label: Role.MUSYRIF,
         }
-      })
-      setMusyrif(options);
+      ]
+      setRole(res);
     } catch (err) {
       console.error('Failed to load user data:', err);
     } finally {
@@ -70,15 +76,11 @@ export default function StudentTable() {
     }
   }
 
-  const loadStudents = async (filter: {
-    grade_status?: string;
-    musyrif_id?: string;
-    name?: string;
-  } = {}) => {
+  const loadUsers = async (role?: Role) => {
     setLoading(true);
     try {
-      const res = await fetchStudent(filter);
-      setStudents(res.data.data);
+      const res = await getUsers(role);
+      setUsers(res.data.data);
     } catch (err) {
       console.error('Failed to load student data:', err);
     } finally {
@@ -86,18 +88,20 @@ export default function StudentTable() {
     }
   };
 
-  useEffect(() => {
-    loadMusyrif();
-    loadStudents();
-  }, []);
+  const getProfile = async () => {
+    try {
+      const res = await fetchUser();
+      setLoggedUsers(res.data);
+    } catch (err) {
+      console.error('Failed to load student data:', err);
+    }
+  }
 
-  const handleFilter = () => {
-    loadStudents({
-      grade_status: gradeStatus || undefined,
-      musyrif_id: musyrifId || undefined,
-      name: name || undefined,
-    });
-  };
+  useEffect(() => {
+    getProfile();
+    loadRole();
+    loadUsers();
+  }, []);
 
 
   return (
@@ -110,49 +114,7 @@ export default function StudentTable() {
             className="bg-green-600 dark:bg-green-700 text-white dark:text-white/90 rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition"
             size="sm"
           >
-            Add Student
-          </Button>
-        </div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-white/90 flex items-center gap-2">
-            Filter
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div>
-            <Input
-              type="text"
-              placeholder="Name"
-              name={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg py-2 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <Input
-              type="text"
-              placeholder="Grade Status"
-              name={gradeStatus}
-              onChange={(e) => setGradeStatus(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <Select
-              options={musyrif}
-              placeholder="Select Musyrif"
-              onChange={handleSelectChange}
-              className="dark:bg-dark-900"
-            />
-          </div>
-        </div>
-        <div className="text-right">
-          <Button
-            onClick={handleFilter}
-            disabled={loading}
-            className="bg-blue-600 dark:bg-blue-900 text-white dark:text-white/90 rounded-lg hover:bg-blue-700 transition"
-          >
-            {loading ? 'Loading...' : 'Apply Filter'}
+            Add User
           </Button>
         </div>
       </div>
@@ -173,31 +135,23 @@ export default function StudentTable() {
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Gender
+                  Email
                 </TableCell>
                 <TableCell
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Grade
+                  <Select
+                    options={role}
+                    onChange={handleSelectChange}
+                    className="dark:bg-dark-900"
+                  />
                 </TableCell>
                 <TableCell
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Grade Status
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Musyrif
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Status
+                  Created At
                 </TableCell>
                 <TableCell
                   isHeader
@@ -210,8 +164,8 @@ export default function StudentTable() {
 
             {/* Table Body */}
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {students.map((student) => (
-                <TableRow key={student.id}>
+              {users.map((user) => (
+                <TableRow key={user.id}>
                   <TableCell className="px-5 py-4 sm:px-6 text-start">
                     <div className="flex items-center gap-3">
                       {/*<div className="w-10 h-10 overflow-hidden rounded-full">*/}
@@ -224,58 +178,55 @@ export default function StudentTable() {
                       {/*</div>*/}
                       <div>
                         <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                          {student.name}
+                          {user.name}
                         </span>
                         <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                          {student.id}
+                          {user.id}
                         </span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {student.gender}
+                    {user.email}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {student.grade}
+                    {user.role}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {student.grade_status}
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {student.Musyrif.name}
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    <Badge
-                      size="sm"
-                      color={
-                        student.status === StudentStatus.ACTIVE
-                          ? "success"
-                          : student.status === StudentStatus.NONACTIVE
-                            ? "warning"
-                            : "error"
-                      }
-                    >
-                      {student.status}
-                    </Badge>
+                    {user.created_at}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     <div className="flex items-center gap-2">
                       <Button
-                        onClick={() => handleEdit(student.id)}
+                        onClick={() => handleEdit(user.id)}
                         type="button"
                         className="bg-yellow-500 dark:bg-yellow-600 hover:bg-yellow-600 dark:hover:bg-yellow-700 text-white dark:text-white/90"
                         size="sm"
                       >
                         <PencilIcon className="fill-gray-500 dark:fill-gray-400" />
                       </Button>
-                      <Button
-                        onClick={() => handleDelete(student.id)}
-                        type="button"
-                        className="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 text-white dark:text-white/90"
-                        size="sm"
-                      >
-                        <TrashBinIcon className="fill-gray-500 dark:fill-gray-400" />
-                      </Button>
+                      { loggedUsers?.id !== user.id ? (
+                        <Button
+                          onClick={() => handleDelete(user.id)}
+                          type="button"
+                          className="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 text-white dark:text-white/90"
+                          size="sm"
+                        >
+                          <TrashBinIcon className="fill-gray-500 dark:fill-gray-400" />
+                        </Button>
+                      ) : (
+                        <Tooltip text="Cannot delete the account you are currently logged in to" position={POSITION.top}>
+                          <Button
+                            onClick={() => handleDelete(user.id)}
+                            type="button"
+                            className="bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 text-white dark:text-white/90"
+                            size="sm"
+                            disabled
+                          >
+                            <TrashBinIcon className="fill-gray-500 dark:fill-gray-400" />
+                          </Button>
+                        </Tooltip>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

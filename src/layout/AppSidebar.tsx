@@ -17,81 +17,114 @@ import {
   TableIcon,
   UserCircleIcon,
 } from "../icons/index";
-import SidebarWidget from "./SidebarWidget";
+import {fetchUser} from "@/lib/api/auth";
+import {User} from "@/lib/types/user";
 
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  allowedRoles?: string[];
+  subItems?: { name: string; path: string; allowedRoles?: string[]; new?: boolean }[];
 };
 
 const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
+    allowedRoles: ["admin", "musyrif"],
     path: "/",
   },
   {
     icon: <ListIcon />,
     name: "Halaqah",
+    allowedRoles: ["admin", "musyrif"],
     subItems: [
-      { name: "Ziyadah", path: "/ziyadah" },
-      { name: "Murojaah", path: "/murojaah" },
+      { name: "Ziyadah", path: "/ziyadah", allowedRoles: ["admin", "musyrif"] },
+      { name: "Murojaah", path: "/murojaah", allowedRoles: ["admin", "musyrif"] },
     ],
   },
   {
     icon: <UserCircleIcon />,
     name: "Santri",
+    allowedRoles: ["admin", "musyrif"],
     path: "/students",
+  },
+  {
+    icon: <UserCircleIcon />,
+    name: "User",
+    allowedRoles: ["admin"],
+    path: "/users",
   },
   {
     icon: <TableIcon />,
     name: "Kehadiran",
+    allowedRoles: ["admin", "musyrif"],
     path: "/basic-tables"
   },
   {
     icon: <CalenderIcon />,
     name: "Tahfidz Plan",
+    allowedRoles: ["admin", "musyrif"],
     path: "/plan",
   },
   {
     name: "Pages",
     icon: <PageIcon />,
+    allowedRoles: ["admin", "musyrif"],
     subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false },
+      { name: "Blank Page", path: "/blank" },
+      { name: "404 Error", path: "/error-404" },
     ],
   },
 ];
+
+const filterNavItemsByRole = (items: NavItem[], role: string): NavItem[] => {
+  return items
+    .filter(item => item.allowedRoles?.includes(role))
+    .map(item => {
+      if (item.subItems) {
+        const filteredSubItems = item.subItems.filter(sub => sub.allowedRoles?.includes(role));
+        if (filteredSubItems.length === 0) return null;
+
+        return {
+          ...item,
+          subItems: filteredSubItems,
+        };
+      }
+      return item;
+    })
+    .filter(Boolean) as NavItem[];
+};
+
 
 const othersItems: NavItem[] = [
   {
     icon: <PieChartIcon />,
     name: "Charts",
     subItems: [
-      { name: "Line Chart", path: "/line-chart", pro: false },
-      { name: "Bar Chart", path: "/bar-chart", pro: false },
+      { name: "Line Chart", path: "/line-chart" },
+      { name: "Bar Chart", path: "/bar-chart" },
     ],
   },
   {
     icon: <BoxCubeIcon />,
     name: "UI Elements",
     subItems: [
-      { name: "Alerts", path: "/alerts", pro: false },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Badge", path: "/badge", pro: false },
-      { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
+      { name: "Alerts", path: "/alerts" },
+      { name: "Avatar", path: "/avatars" },
+      { name: "Badge", path: "/badge" },
+      { name: "Buttons", path: "/buttons" },
+      { name: "Images", path: "/images" },
+      { name: "Videos", path: "/videos" },
     ],
   },
   {
     icon: <PlugInIcon />,
     name: "Authentication",
     subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
+      { name: "Sign In", path: "/signin" },
+      { name: "Sign Up", path: "/signup" },
     ],
   },
 ];
@@ -99,13 +132,17 @@ const othersItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+  const [profile, setProfile] = useState<User>();
+  const [isProfileLoaded, setIsProfileLoaded] = useState(false);
+  const [navItemsByRole, setNavItemsByRole] = useState<NavItem[]>();
+  const [isLoadedNavItems, setIsLoadedNavItems] = useState(false);
 
   const renderMenuItems = (
-    navItems: NavItem[],
+    navItems: NavItem[] | undefined,
     menuType: "main" | "others"
   ) => (
     <ul className="flex flex-col gap-4">
-      {navItems.map((nav, index) => (
+      {navItems?.map((nav, index) => (
         <li key={nav.name}>
           {nav.subItems ? (
             <button
@@ -225,13 +262,30 @@ const AppSidebar: React.FC = () => {
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // const isActive = (path: string) => path === pathname;
-   const isActive = useCallback((path: string) => path === pathname, [pathname]);
+  const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
   useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetchUser();
+        setProfile(res.data);
+      } catch (err) {
+        console.error('Failed to load user profile:', err);
+      } finally {
+        setIsProfileLoaded(true);
+        setIsLoadedNavItems(true);
+      }
+    }
+    fetchProfile()
+  }, []);
+
+  useEffect(() => {
+    if (!isProfileLoaded) return;
     // Check if the current path matches any submenu item
     let submenuMatched = false;
+    const sidebarItems = filterNavItemsByRole(navItems, profile?.role?.toLowerCase() || "");
     ["main", "others"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : othersItems;
+      const items = menuType === "main" ? sidebarItems : othersItems;
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
@@ -251,7 +305,8 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [pathname,isActive]);
+    setNavItemsByRole(sidebarItems);
+  }, [isProfileLoaded, isLoadedNavItems, pathname, isActive]);
 
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened
@@ -344,7 +399,11 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(navItems, "main")}
+              {!isLoadedNavItems ? (
+                <div className="px-4 py-2 text-gray-400 animate-pulse">Loading menu...</div>
+              ) : (
+                renderMenuItems(navItemsByRole, "main")
+              )}
             </div>
 
             <div className="">
@@ -365,7 +424,7 @@ const AppSidebar: React.FC = () => {
             </div>
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
+        {/*{isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}*/}
       </div>
     </aside>
   );

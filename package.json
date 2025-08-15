@@ -23,6 +23,7 @@
     "autoprefixer": "^10.4.20",
     "flatpickr": "^4.6.13",
     "js-cookie": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
     "next": "15.2.3",
     "next-auth": "^4.24.11",
     "react": "^19.0.0",
@@ -37,6 +38,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@svgr/webpack": "^8.1.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

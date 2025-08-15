@@ -11,3 +11,9 @@ export interface Response<T> {
     };
   };
 }
+
+export interface SingleResponse<T> {
+  success: boolean;
+  message: string;
+  data: T
+}
