@@ -11,6 +11,7 @@ import Select from "@/components/form/Select";
 import Input from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
 import {PencilIcon, TrashBinIcon} from "@/icons";
+import { useRouter } from "next/navigation";
 
 interface Options {
   value: string;
@@ -24,9 +25,10 @@ export default function StudentTable() {
   const [students, setStudents] = useState<Student[]>([]);
   const [musyrif, setMusyrif] = useState<Options[]>([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleAdd = () => {
-    console.log('Add student with id:');
+    router.push('/students/add');
   };
 
   const handleEdit = (id: string) => {
@@ -158,7 +160,7 @@ export default function StudentTable() {
       </div>
 
       <div className="max-w-full overflow-x-auto">
-        <div className="min-w-[1102px]">
+        <div className="min-w-[1000px]">
           <Table>
             {/* Table Header */}
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">

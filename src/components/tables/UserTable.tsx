@@ -17,7 +17,7 @@ interface Options {
 }
 
 export default function UserTable() {
-  const [roleId, setRoleId] = useState('');
+  const [, setRoleId] = useState('');
   const [role, setRole] = useState<Options[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loggedUsers, setLoggedUsers] = useState<User>();
@@ -120,7 +120,7 @@ export default function UserTable() {
       </div>
 
       <div className="max-w-full overflow-x-auto">
-        <div className="min-w-[1102px]">
+        <div className="min-w-[1000px]">
           <Table>
             {/* Table Header */}
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
